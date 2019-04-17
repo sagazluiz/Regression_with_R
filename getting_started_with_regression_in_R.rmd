@@ -1,0 +1,124 @@
+---
+title: "Getting Started with Regression in R"
+output:
+  pdf_document: default
+  html_notebook: default
+editor_options:
+  chunk_output_type: console
+---
+
+How much variable x interfer with variable y is possible to predict using regression. 
+Using linear and no-linear regression using polynomias and spines. 
+
+
+# load library
+```{r}
+library("readxl")
+
+library(splines) # for complex datasets
+
+
+```
+
+# load dataset
+```{r}
+# dummy dataset to analyse
+data_dummy <- read_xlsx("C:/Regression with R/01_example.xlsx")
+
+```
+
+# graph analysis
+```{r}
+
+plot(data_dummy$x,data_dummy$y, col="blue", main="Example  Graph")
+grid(nx= 12, ny=12, col = "lightgray", lty = "dotted", lwd = par("lwd"), equilogs = TRUE)
+
+```
+The result seems to follow a non-linear pattern
+
+# model guessing that is second degree polynomial
+```{r}
+
+my_model <- lm(data_dummy$y ~ poly(data_dummy$x, 2))
+
+# but you can test another alternatives
+my_model_linear <- lm(data_dummy$y ~ poly(data_dummy$x, 1))
+
+my_model_degree_20 <- lm(data_dummy$y ~ poly(data_dummy$x, 20))
+
+my_model_spline <- lm(data_dummy$y ~ bs(data_dummy$x)) # Here, bs is the base function. Use the parameters knots and df to make the function smoother or curvier.
+
+
+
+```
+
+# check polynommial result
+```{r}
+
+plot(data_dummy$x,data_dummy$y, col="blue", main="Example  Graph")
+grid(nx= 12, ny=12, col = "lightgray", lty = "dotted", lwd = par("lwd"), equilogs = TRUE)
+lines(data_dummy$x, predict(lm(data_dummy$y ~ poly(data_dummy$x, 2))))
+
+```
+
+
+# check alternative linear
+```{r}
+
+plot(data_dummy$x,data_dummy$y, col="blue", main="Example  Graph")
+grid(nx= 12, ny=12, col = "lightgray", lty = "dotted", lwd = par("lwd"), equilogs = TRUE)
+lines(data_dummy$x, predict(my_model_linear <- lm(data_dummy$y ~ poly(data_dummy$x, 1))))
+
+```
+
+# check alternative degree 20
+```{r}
+
+plot(data_dummy$x,data_dummy$y, col="blue", main="Example  Graph")
+grid(nx= 12, ny=12, col = "lightgray", lty = "dotted", lwd = par("lwd"), equilogs = TRUE)
+lines(data_dummy$x, predict(my_model_degree_20 <- lm(data_dummy$y ~ poly(data_dummy$x, 20))))
+
+```
+
+# check model spline
+```{r}
+
+plot(data_dummy$x,data_dummy$y, col="blue", main="Example  Graph")
+grid(nx= 12, ny=12, col = "lightgray", lty = "dotted", lwd = par("lwd"), equilogs = TRUE)
+lines(data_dummy$x, predict(my_model_spline <- lm(data_dummy$y ~ bs(data_dummy$x))))
+
+
+```
+
+
+# plot models
+```{r}
+
+plot(my_model)
+
+plot(my_model_linear)
+
+plot(my_model_degree_20)
+
+plot(my_model_spline)
+
+```
+
+
+# t test --This test is going to compare their means, assuming they both are under a normal distribution.
+```{r}
+
+t.test(data_dummy$y, predict(my_model))
+
+t.test(data_dummy$y, predict(my_model_linear))
+
+t.test(data_dummy$y, predict(my_model_degree_20))
+
+t.test(data_dummy$y, predict(my_model_spline))
+
+
+```
+
+
+Fonte: 
+https://www.datasciencecentral.com/profiles/blogs/getting-started-with-regression-in-r
